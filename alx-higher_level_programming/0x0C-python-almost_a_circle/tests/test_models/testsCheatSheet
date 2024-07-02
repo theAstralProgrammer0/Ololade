@@ -1,0 +1,59 @@
+no_args
+None_arg
+one_arg
+more_than_one_arg
+bytes_arg
+str_arg
+empty_str_arg
+bool_arg
+zero_arg
+int_arg
+float_arg
+neg_arg
+cmpx_num_arg
+inf_num_arg
+nan_num_arg
+set_arg
+tuple_arg
+list_arg
+dict_arg
+
+ kwargs = {'__class__': BaseModel,
+                    'created_at': datetime.datetim.now(),
+                    'update_at': datetime.datetime.now() + timedelta(days=1),
+                    'first_name': 'Betty',
+                    'last_name': 'Holberton',
+                    'email': 'hbtn@sch.com',
+                    'age': 98
+                    }
+          kwargs = {'created_at': datetime.datetim.now(),
+                    'update_at': datetime.datetime.now() + timedelta(days=1),
+                    'first_name': 'Betty',
+                    'last_name': 'Holberton',
+                    'email': 'hbtn@sch.com',
+                    'age': 98
+                    }
+          kwargs = {'update_at': datetime.datetime.now() + timedelta(days=1),
+                    'first_name': 'Betty',
+                    'last_name': 'Holberton',
+                    'email': 'hbtn@sch.com',
+                    'age': 98
+                    }
+          kwargs = {'first_name': 'Betty',
+                    'last_name': 'Holberton',
+                    'email': 'hbtn@sch.com',
+                    'age': 98
+                    }
+          kwargs = {'last_name': 'Holberton',
+                    'email': 'hbtn@sch.com',
+                    'age': 98
+                    }
+          kwargs = {'email': 'hbtn@sch.com',
+                    'age': 98
+                   }
+ 
+          kwargs = {'age': 98}
+
+
+
+

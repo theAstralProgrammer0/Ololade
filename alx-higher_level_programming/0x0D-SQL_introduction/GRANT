@@ -1,0 +1,143 @@
+---How to use `GRANT` and `REVOKE` to manage privileges in MySQL
+
+1. This can help you understand what privileges are best suited for your users' responsibilities.
+	SHOW PRIVILEGES;
+
+2. You can always view the privileges granted to your own user by typing this
+	SHOW GRANTS;
+
+3. The output will display the privileges of the provided account.
+	SHOW GRANTS FOR '<user>'@'<host>';
+
+---How do you use the GRANT command?
+
+1. The output will display the privileges of the provided account. Multiple privileges can be provided, separated by commas.
+	GRANT <privileges> ON <database>.<object> TO '<user>'@'<host>';
+
+2. To grant SELECT privileges globally for 'sally'@'localhost', you would type this
+	GRANT SELECT ON *.* TO 'sally'@'localhost';
+
+3. To limit the scope of a grant to a single database, replace the wildcard on the left side of the dot with a database name
+	GRANT SELECT ON accounting.* TO 'meredith'@'localhost';
+
+4. If an account only needs access to a single table within a database, specify the table name on the right side of the dot:
+	GRANT UPDATE ON accounting.revenue TO 'frank'@'localhost';
+
+5. To grant the ability to update the value of the due_by column in the library.loans table, you can type:
+	GRANT UPDATE (due_by) ON library.loans TO 'autorenew'@'localhost';
+
+
+---Using the WITH GRANT OPTION clause
+
+1. Here, we can give the 'librarymanager'@'localhost' account SELECT, INSERT, UPDATE, and DELETE privileges, as well as the 
+   ability to pass on its privileges at in the library database to other users with:
+	GRANT SELECT,INSERT,UPDATE,DELETE ON library.* TO 'librarymanager'@'localhost' WITH GRANT OPTION;
+2. = 1.
+	GRANT SELECT,INSERT,UPDATE,DELETE ON library.* TO 'librarymanager'@'localhost';
+	GRANT GRANT OPTION ON library.* TO 'librarymanager'@'localhost';
+
+3. = 2. = 1.
+	GRANT SELECT,INSERT,UPDATE,DELETE,GRANT OPTION ON library.* TO 'librarymanager'@'localhost';
+
+
+---Granting common privileges to user accounts
+
+--How do you grant users full access?
+
+1. You can assign full privileges to a user at a specific scope using the ALL or ALL PRIVILEGES shorthand:
+	GRANT ALL PRIVILEGES ON sales.* TO 'salesadmin'@'localhost';
+   This will grant every privilege that your user is capable of assigning on the sales database to the 
+   'salesadmin'@'localhost' user, with a couple important exceptions.
+	The ALL PRIVILEGES privilege bundle does not include the GRANT OPTION or PROXY privileges, 
+	which must be assigned separately. This is to make it easier to assign full privileges without 
+	passing on privilege administration and user substitution privileges.
+
+2. To assign all privileges except GRANT OPTION and PROXY globally, use the *.* scope:
+	GRANT ALL PRIVILEGES ON *.* TO 'systemadmin'@'localhost';
+
+--How do you grant users full access including privilege administration?
+
+1. To give the 'salesadmin'@'localhost' account from the last example the ability to control other users' 
+   access to the sales database, you could instead type:
+	GRANT ALL PRIVILEGES ON sales.* TO 'salesadmin'@'localhost' WITH GRANT OPTION;
+   The account will then not only have full access to the sales database, it will also be able to dictate
+   what other users are able to do on the database.
+
+2. This same logic can be applied globally using the *.* context. In this cases, it'll make the given account a full administrative user: 
+	GRANT ALL PRIVILEGES ON *.* TO 'fulladmin'@'localhost' WITH GRANT OPTION;
+
+--How do you grant users read-only access?
+
+1. To give the 'salesreport'@'localhost' user read-only access to the sales database, type:
+	GRANT SELECT ON sales.* TO 'salesreport'@'localhost';
+
+2. As usual, the global equivalent uses the *.* scope:
+	GRANT SELECT ON *.* TO 'globalread'@'localhost';
+
+--How do you grant users read and write access?
+
+1. To assign read and write access to a user, grant them SELECT, INSERT, UPDATE, and DELETE privileges on the object. For example:
+	GRANT SELECT,INSERT,UPDATE,DELETE ON website.profiles TO 'profilemanager'@'localhost';
+
+--How do you grant users append-only access?
+1. To allow an account append-only privileges on a database object, only grant them SELECT and INSERT privileges:
+	GRANT SELECT,INSERT ON website.eventlog TO 'weblogger'@'localhost';
+
+2. If you want the account to selectively be able to update certain parts of the record, you can additionally
+   grant them UPDATE privileges on the appropriate columns:
+	GRANT SELECT,INSERT ON website.eventlog TO 'weblogger'@'localhost';
+	GRANT UPDATE (comments) ON website.eventlog TO 'weblogger'@'localhost';
+
+
+---How do you use the REVOKE command?
+
+1. The REVOKE command mirrors the GRANT command fairly closely. Aside from the command name, you revoke privileges 
+   from an account rather than granting them to the account.
+	REVOKE <privileges> ON <database>.<object> FROM '<user>'@'<host>';
+
+
+--Targeting databases, tables, columns, etc.
+
+1. To remove a privilege at the global level, use the *.* wildcard to match any database and any database object:
+	REVOKE SELECT ON *.* FROM 'sally'@'localhost';
+
+2. To remove a privilege from a specific database, specify the database name on the left side of the dot:
+	REVOKE SELECT ON accounting.* FROM 'meredith'@'localhost';
+
+3. And finally, to remove a privilege from a database object, name the database and the object name separated by a dot:
+	REVOKE UPDATE ON accounting.revenue FROM 'frank'@'localhost';
+
+
+						Now, to set up the user account described above, you could type:
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+						CREATE USER 'normaladmin'@'localhost' IDENTIFIED BY '<password>';
+						GRANT ALL PRIVILEGES ON *.* TO 'normaladmin'@'localhost';
+						REVOKE ALL PRIVILEGES ON mysql.* FROM 'normaladmin'@'localhost';
+						GRANT SELECT ON mysql.* TO 'normaladmin'@'localhost';
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+				Here, we've created a user and granted them full privileges for the entire MySQL server.
+				Afterwards, we revoke those privileges specifically in the context of the mysql database.
+				We then re-grant the SELECT privilege so that the account can still read values from the database.
+				If you look at the privileges for this account, something similar to this will be displayed:
+
+=============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+SHOW GRANTS FOR 'normaladmin'@'localhost'\G
+*************************** 1. row ***************************
+Grants for normaladmin@localhost: GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, SHUTDOWN, PROCESS, FILE, REFERENCES, INDEX, ALTER, SHOW DATABASES, SUPER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER, CREATE TABLESPACE, CREATE ROLE, DROP ROLE ON *.* TO `normaladmin`@`localhost`
+*************************** 2. row ***************************
+Grants for normaladmin@localhost: GRANT APPLICATION_PASSWORD_ADMIN,AUDIT_ADMIN,BACKUP_ADMIN,BINLOG_ADMIN,BINLOG_ENCRYPTION_ADMIN,CLONE_ADMIN,CONNECTION_ADMIN,ENCRYPTION_KEY_ADMIN,GROUP_REPLICATION_ADMIN,INNODB_REDO_LOG_ARCHIVE,INNODB_REDO_LOG_ENABLE,PERSIST_RO_VARIABLES_ADMIN,REPLICATION_APPLIER,REPLICATION_SLAVE_ADMIN,RESOURCE_GROUP_ADMIN,RESOURCE_GROUP_USER,ROLE_ADMIN,SERVICE_CONNECTION_ADMIN,SESSION_VARIABLES_ADMIN,SET_USER_ID,SHOW_ROUTINE,SYSTEM_USER,SYSTEM_VARIABLES_ADMIN,TABLE_ENCRYPTION_ADMIN,XA_RECOVER_ADMIN ON *.* TO `normaladmin`@`localhost`
+*************************** 3. row ***************************
+Grants for normaladmin@localhost: REVOKE INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON `mysql`.* FROM `normaladmin`@`localhost`
+3 rows in set (0.00 sec)
+=============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+
+
+
+
+
+
+
+
+

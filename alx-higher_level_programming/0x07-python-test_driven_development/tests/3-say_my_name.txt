@@ -1,0 +1,135 @@
+
+=================================
+How to Use 3-say_my_name.py
+=================================
+
+DOCUMENTATION FOR `say_my_name` FUNCTION
+
+Description:
+Prints the message "My name is <first name> <last name>".
+
+Arguments:
+	`first_name`(str): The first name to print.
+	`last_name`(str, optional): The last name to print. Defaults to "".
+
+Returns:
+	Nothing
+
+Raises:
+	TypeError:
+		 1. If first_name or last_name is not a string.
+
+Usage
+=====
+`say_mt_name(...)` Prints the message "My name is <first name> <last name>".
+
+::
+
+    >>> say_my_name = __import__('3-say_my_name').say_my_name
+    >>>
+    >>> say_my_name("John")
+    My name is John 
+
+::
+
+    >>> say_my_name("John", "Doe")
+    My name is John Doe
+
+::
+
+    >>> say_my_name(first_name="Bart")
+    My name is Bart 
+
+::
+
+    >>> say_my_name("", "Bart")
+    My name is  Bart
+
+::
+
+    >>> say_my_name("", "")
+    My name is  
+
+::
+
+    
+
+TypeError
+=========
+Trying to print invalid strings
+
+::
+
+    >>> say_my_name(123)
+    Traceback (most recent call last):
+    TypeError: first_name must be a string
+
+::
+
+    >>> say_my_name("John", 456)
+    Traceback (most recent call last):
+    TypeError: last_name must be a string
+
+::
+ 
+    >>> say_my_name(["John"])
+    Traceback (most recent call last):
+    TypeError: first_name must be a string
+
+::
+
+    >>> say_my_name("John", [1, 2, 3])
+    Traceback (most recent call last):
+    TypeError: last_name must be a string
+
+::
+
+    >>> say_my_name("John", None)
+    Traceback (most recent call last):
+    TypeError: last_name must be a string
+
+::
+
+    >>> say_my_name()
+    Traceback (most recent call last):
+    TypeError: say_my_name() missing 1 required positional argument: 'first_name'
+
+::
+
+    >>> say_my_name("  ")
+    My name is    
+
+::
+
+    >>> say_my_name("John", "  ")
+    My name is John   
+
+::
+
+    >>> say_my_name(None, None)
+    Traceback (most recent call last):
+    TypeError: first_name must be a string
+
+::
+
+    >>> say_my_name(None, "Ty")
+    Traceback (most recent call last):
+    TypeError: first_name must be a string
+
+::
+
+    >>> say_my_name("John", first_name="Doe", last_name="Smith")
+    Traceback (most recent call last):
+    TypeError: say_my_name() got multiple values for argument 'first_name'
+
+::
+
+    >>> say_my_name(first_name="Doe", middle_name="Smith")
+    Traceback (most recent call last):
+    TypeError: say_my_name() got an unexpected keyword argument 'middle_name'
+
+::
+  
+    >>> say_my_name((1), ("90"))
+    Traceback (most recent call last):
+    TypeError: first_name must be a string
